@@ -81,7 +81,7 @@ It makes a reverse shell to DTUHAX's server. The challenge is not done.
 
 ![no alt](images/dighost5.png)
 
-We still can't read bonus_flag. Turns out you have to be user 20000, (aka root? I think) and we are not user 20000. Luckily `/dig` is a setuid binary with the right user, and DiG has an option to read domains to query from a file⁴, and it echos those domains!
+We still can't read bonus_flag. Turns out you have to be user 200000, (aka root? I think) and we are not user 200000. Luckily `/dig` is a setuid binary with the right user, and DiG has an option to read domains to query from a file⁴, and it echos those domains!
 
 ![command on challenge server](images/dighost6.png)
 
@@ -94,12 +94,14 @@ works fine locally?
 We spent a long time trying to figure this out, eventually we used the rev shell to copy their version of DiG and reversed it. It is not at all the normal DiG binary.
 ![no alt](images/dighost8.png)
 
-Turns out they have 2 dig binaries and a symlink
+Turns out they have 2 dig binaries and a symlink. I searched the whole filesystem on remote for files called `dig`. It's not that many binaries, but it's one more than we'd expect.
 ```
 $ find / -name dig 2>/dev/null
 /usr/bin/dig
 /web-apps/php/html/dig
 /dig
+$ ls -al /web-apps/php/html/dig
+lrwxrwxrwx 1 nobody nogroup 4 Oct 26 13:26 /web-apps/php/html/dig -> /dig
 ```
 The binary checks that `argc == 2` and filters some illegal characters from the first argument, then it just runs it in bash.
 
@@ -119,7 +121,7 @@ $ /dig -fbonus_flag
 Why does ``'`{cat,bonus_flag}`'`` work? The payload is quoted in single quotes, which should make it be treated as a string. Additionally, the PHP user doesn't have permission to access the bonus_flag file. This only works because the single quotes makes the first instance of bash (as run by PHP) pass the inner data as is to the fake dig binary.
 PHP runs ``/dig '`{cat,bonus_flag}`'`` which makes the fake dig binary run execve which runs `/bin/bash` with the arguments og `bash`, `-pc` and `` dig `{cat,bonus_flag}` ``.
 
-What exactly happens after this is left as an exercise for the read :)
+What exactly happens after this is left as an exercise for the reader. :)
 
 ### alternative writeup
 pyjam.as's [writeup](https://pyjam.as/writeups/fectf2022) shows a really creative solution that involves modifying your DNS records! It's in danish though, and the website is abhorent.
