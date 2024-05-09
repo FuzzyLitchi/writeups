@@ -64,7 +64,7 @@ The xor operation over 128 bits is the same as addition on vectors modulo 2. We 
 $$
 \begin{align*}
 \widetilde{h} &= \sum_{i=4}^{67} b_i \widetilde{h}_i\\
-\widetilde{h} &= \sum_{i=4}^{67} \widetilde{h}_i b_i\\
+\widetilde{h} &= \sum\_{i=4}^{67} \widetilde{h}_i b_i\\
 \widetilde{h} &= \widetilde{H} b\\
 \end{align*}
 $$
